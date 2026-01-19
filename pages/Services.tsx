@@ -18,10 +18,10 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
   const plans = [
     {
       id: 'basic',
-      title: 'Social Discovery',
+      title: 'Kind Search',
       icon: Search,
       price: 1000,
-      description: 'Ideal for finding a specific person from a physical encounter or limited information.',
+      description: 'Ideal for getting a partner for casual dating and light connections.',
       features: [
         'Instagram ID Retrieval',
         'Profile Verification',

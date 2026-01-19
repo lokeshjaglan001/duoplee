@@ -122,7 +122,7 @@ User accepted policies: Yes
                         <Phone className="w-5 h-5 text-rose-600 mt-1 mr-4" />
                         <div>
                             <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wide">Phone</h4>
-                            <p className="text-slate-600">+91 98765 43210</p>
+                            <p className="text-slate-600">+91 92546 11524</p>
                         </div>
                     </div>
                     <div className="flex items-start">
