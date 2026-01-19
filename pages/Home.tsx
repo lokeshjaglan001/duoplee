@@ -3,6 +3,7 @@ import { ArrowRight, Search, Heart, ShieldCheck, Clock, CheckCircle } from 'luci
 
 const Home: React.FC = () => {
   return (
+
     <div id="home" className="flex flex-col w-full">
       {/* Hero Section */}
       <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -30,7 +31,7 @@ const Home: React.FC = () => {
           </h1>
           
           <p className="text-lg md:text-xl text-slate-200 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
-            We specialize in high-precision social discovery and partner verification. 
+            We are specialized in high-precision social discovery and partner verification. 
             Whether you are searching for a missed connection or your life partner, we bridge the gap.
           </p>
           
