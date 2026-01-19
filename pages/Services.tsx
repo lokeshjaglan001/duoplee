@@ -342,7 +342,7 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
                 <div className="space-y-3">
                   {/* The actual payment link uses the number as VPA */}
                   <a 
-                    href={isPaymentFormValid ? `upi://pay?pa=8930963832@okaxis&pn=Duoplee&am=${getPrice(selectedPlan.price)}&cu=INR` : '#'}
+                    href={isPaymentFormValid ? `upi://pay?pa=duoplee@okaxis&pn=Duoplee&am=${getPrice(selectedPlan.price)}&cu=INR` : '#'}
                     onClick={handlePayClick}
                     className={`w-full py-4 rounded-xl font-bold text-center transition-all flex items-center justify-center gap-2 shadow-lg ${
                       isPaymentFormValid 
