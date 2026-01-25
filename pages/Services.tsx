@@ -44,7 +44,7 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
       id: 'basic',
       title: 'Social Discovery',
       icon: Search,
-      price: 1000,
+      price: 1,
       matchCount: 3, // How many profiles to give
       description: 'Ideal for finding a specific person from a physical encounter or limited information.',
       features: [
@@ -93,7 +93,7 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
     },
   ];
 
-  const getPrice = (base: number) => deliveryMode === 'express' ? base + 500 : base;
+  const getPrice = (base: number) => deliveryMode === 'express' ? base + 5 : base;
 
   const handlePlanClick = (plan: any) => {
     if (!gender) {
