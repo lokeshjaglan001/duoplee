@@ -8,25 +8,25 @@ interface ServicesProps {
 
 // --- CONFIGURATION: PASTE YOUR PROFILES HERE ---
 const INSTAGRAM_PROFILES_DATABASE = [
-  { handle: '@travel_wanderer_99', niche: 'Travel', age: 26, location: 'Mumbai', occupation: 'Marketing Executive' },
-  { handle: '@fitness_guru_22', niche: 'Fitness', age: 29, location: 'Delhi', occupation: 'Personal Trainer' },
-  { handle: '@bookworm_sarah', niche: 'Literature', age: 25, location: 'Bangalore', occupation: 'Content Writer' },
-  { handle: '@tech_enthusiast_x', niche: 'Tech', age: 31, location: 'Hyderabad', occupation: 'Software Engineer' },
-  { handle: '@coffee_lover_delhi', niche: 'Lifestyle', age: 27, location: 'New Delhi', occupation: 'Architect' },
-  { handle: '@artistic_soul_mumbai', niche: 'Art', age: 24, location: 'Pune', occupation: 'Graphic Designer' },
-  { handle: '@foodie_adventures_in', niche: 'Food', age: 28, location: 'Chandigarh', occupation: 'Restaurateur' },
-  { handle: '@music_vibes_only', niche: 'Music', age: 23, location: 'Goa', occupation: 'Musician' },
-  { handle: '@startup_hustler_bg', niche: 'Business', age: 32, location: 'Bangalore', occupation: 'Product Manager' },
-  { handle: '@nature_clicks_official', niche: 'Photography', age: 30, location: 'Manali', occupation: 'Photographer' },
-  { handle: '@fashion_ista_diva', niche: 'Fashion', age: 26, location: 'Mumbai', occupation: 'Fashion Stylist' },
+  { handle: '@travel_wanderer_99', niche: 'Travel', age: 21, location: 'Mumbai', occupation: 'Marketing Executive' },
+  { handle: '@fitness_guru_22', niche: 'Fitness', age: 19, location: 'Delhi', occupation: 'Personal Trainer' },
+  { handle: '@bookworm_sarah', niche: 'Literature', age: 20, location: 'Bangalore', occupation: 'Content Writer' },
+  { handle: '@tech_enthusiast_x', niche: 'Tech', age: 21, location: 'Hyderabad', occupation: 'Software Engineer' },
+  { handle: '@coffee_lover_delhi', niche: 'Lifestyle', age: 22, location: 'New Delhi', occupation: 'Architect' },
+  { handle: '@artistic_soul_mumbai', niche: 'Art', age: 18, location: 'Pune', occupation: 'Graphic Designer' },
+  { handle: '@foodie_adventures_in', niche: 'Food', age: 18, location: 'Chandigarh', occupation: 'Restaurateur' },
+  { handle: '@music_vibes_only', niche: 'Music', age: 13, location: 'Goa', occupation: 'Musician' },
+  { handle: '@startup_hustler_bg', niche: 'Business', age: 23, location: 'Bangalore', occupation: 'Product Manager' },
+  { handle: '@nature_clicks_official', niche: 'Photography', age: 20, location: 'Manali', occupation: 'Photographer' },
+  { handle: '@fashion_ista_diva', niche: 'Fashion', age: 16, location: 'Mumbai', occupation: 'Fashion Stylist' },
   { handle: '@gamer_pro_zone', niche: 'Gaming', age: 22, location: 'Hyderabad', occupation: 'Streamer' },
-  { handle: '@yoga_peace_mind', niche: 'Wellness', age: 33, location: 'Rishikesh', occupation: 'Yoga Instructor' },
-  { handle: '@pet_lover_club', niche: 'Animals', age: 27, location: 'Chennai', occupation: 'Veterinarian' },
-  { handle: '@cinema_buff_central', niche: 'Movies', age: 29, location: 'Mumbai', occupation: 'Assistant Director' },
-  { handle: '@finance_wizard_01', niche: 'Finance', age: 34, location: 'Gurgaon', occupation: 'Investment Banker' },
-  { handle: '@medical_life_dr', niche: 'Health', age: 30, location: 'Delhi', occupation: 'Doctor' },
-  { handle: '@legal_eagle_law', niche: 'Law', age: 28, location: 'Mumbai', occupation: 'Corporate Lawyer' },
-  { handle: '@chef_master_ind', niche: 'Culinary', age: 31, location: 'Kolkata', occupation: 'Head Chef' },
+  { handle: '@yoga_peace_mind', niche: 'Wellness', age: 23, location: 'Rishikesh', occupation: 'Yoga Instructor' },
+  { handle: '@pet_lover_club', niche: 'Animals', age: 17, location: 'Chennai', occupation: 'Veterinarian' },
+  { handle: '@cinema_buff_central', niche: 'Movies', age: 19, location: 'Mumbai', occupation: 'Assistant Director' },
+  { handle: '@finance_wizard_01', niche: 'Finance', age: 24, location: 'Gurgaon', occupation: 'Investment Banker' },
+  { handle: '@medical_life_dr', niche: 'Health', age: 20, location: 'Delhi', occupation: 'Doctor' },
+  { handle: '@legal_eagle_law', niche: 'Law', age: 18, location: 'Mumbai', occupation: 'Corporate Lawyer' },
+  { handle: '@chef_master_ind', niche: 'Culinary', age: 21, location: 'Kolkata', occupation: 'Head Chef' },
   { handle: '@dance_rhythm_soul', niche: 'Arts', age: 25, location: 'Bangalore', occupation: 'Choreographer' }
 ];
 
@@ -45,7 +45,7 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
       id: 'basic',
       title: 'Social Discovery',
       icon: Search,
-      price: 1000,
+      price: 1,
       matchCount: 3, // How many profiles to give
       description: 'Ideal for finding a specific person from a physical encounter or limited information.',
       features: [
@@ -94,7 +94,7 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
     },
   ];
 
-  const getPrice = (base: number) => deliveryMode === 'express' ? base + 500 : base;
+  const getPrice = (base: number) => deliveryMode === 'express' ? base + 5 : base;
 
   const handlePlanClick = (plan: any) => {
     if (!gender) {
