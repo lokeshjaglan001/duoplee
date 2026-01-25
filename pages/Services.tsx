@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, Zap, Star, Shield, Search, Heart, X, Smartphone, ArrowRight, CheckCircle, User, Mail, CreditCard } from 'lucide-react';
+import { Check, Zap, Star, Shield, Search, Heart, X, Smartphone, ArrowRight, CheckCircle, User, Mail, CreditCard, Copy, QrCode, AlertCircle } from 'lucide-react';
 import { DeliveryMode } from '../types';
 
 interface ServicesProps {
@@ -35,6 +35,7 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
   const [gender, setGender] = useState<string>('');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const [copied, setCopied] = useState(false);
   
   // New state for payment form user details
   const [paymentForm, setPaymentForm] = useState({ name: '', email: '' });
@@ -44,7 +45,7 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
       id: 'basic',
       title: 'Social Discovery',
       icon: Search,
-      price: 1,
+      price: 1000,
       matchCount: 3, // How many profiles to give
       description: 'Ideal for finding a specific person from a physical encounter or limited information.',
       features: [
@@ -93,7 +94,7 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
     },
   ];
 
-  const getPrice = (base: number) => deliveryMode === 'express' ? base + 5 : base;
+  const getPrice = (base: number) => deliveryMode === 'express' ? base + 500 : base;
 
   const handlePlanClick = (plan: any) => {
     if (!gender) {
@@ -149,15 +150,31 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
     }, 5000); // 5 second delay to allow app to open
   };
 
+  const VPA = 'humanshujaglan@okicici';
+  
+  // Standard UPI String construction
+  const getUpiString = () => {
+    const amount = getPrice(selectedPlan?.price || 0).toFixed(2); // Ensure decimal format
+    return `upi://pay?pa=${VPA}&am=${amount}&cu=INR`;
+  };
+
   const getPaymentLink = (app: 'generic' | 'gpay' | 'phonepe' | 'paytm') => {
-    const base = `pa=8930963832@okaxis&pn=Duoplee&am=${getPrice(selectedPlan?.price || 0)}&cu=INR`;
+    const amount = getPrice(selectedPlan?.price || 0).toFixed(2);
+    // Construct base arguments without the prefix
+    const args = `pa=${VPA}&am=${amount}&cu=INR`;
     
     switch (app) {
-        case 'gpay': return `gpay://upi/pay?${base}`;
-        case 'phonepe': return `phonepe://pay?${base}`;
-        case 'paytm': return `paytmmp://pay?${base}`;
-        default: return `upi://pay?${base}`;
+        case 'gpay': return `gpay://upi/pay?${args}`;
+        case 'phonepe': return `phonepe://pay?${args}`;
+        case 'paytm': return `paytmmp://pay?${args}`;
+        default: return `upi://pay?${args}`;
     }
+  };
+
+  const copyVpa = () => {
+    navigator.clipboard.writeText(VPA);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -344,26 +361,9 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-6 text-white shadow-lg shadow-blue-900/20 mb-6 relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 p-4 opacity-10">
-                    <Smartphone size={100} />
-                  </div>
-                  <div className="relative z-10">
-                    <p className="text-blue-100 text-xs font-bold uppercase tracking-wider mb-4">Pay via Google Pay / UPI</p>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-2xl font-bold tracking-wide">Duoplee</p>
-                        <p className="text-blue-200 text-xs mt-1 flex items-center gap-1">
-                          <CheckCircle size={12} className="text-blue-200" /> Official Business Account
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
                 {/* User Details Form in Modal */}
                 <div className="space-y-4 mb-6">
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Required Details for Payment</p>
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Required Details (Before Payment)</p>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <User size={16} className="text-slate-400" />
@@ -390,8 +390,9 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Select Payment App</p>
+                {/* Direct App Links (PRIORITY) */}
+                <div className="space-y-4 mb-6">
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider text-center">Tap to Pay (Directly)</p>
                   <div className="grid grid-cols-2 gap-3">
                     <a 
                       href={isPaymentFormValid ? getPaymentLink('gpay') : '#'}
@@ -439,11 +440,44 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
                     </a>
                   </div>
                 </div>
+
+                {/* QR CODE SECTION (BACKUP) */}
+                <div className="bg-slate-50 p-6 rounded-2xl flex flex-col items-center border border-slate-100">
+                  <div className="flex items-center gap-2 text-slate-600 font-medium text-sm mb-3">
+                    <QrCode size={16} /> Or Scan QR Code
+                  </div>
+                  <div className="bg-white p-2 rounded-xl shadow-sm mb-4">
+                    {/* Generates a QR code for the standard UPI string */}
+                    <img 
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(getUpiString())}`}
+                      alt="Payment QR Code"
+                      className="w-48 h-48"
+                    />
+                  </div>
+                  
+                  {/* Manual Copy */}
+                  <div className="w-full flex items-center justify-between bg-white border border-slate-200 rounded-lg px-3 py-2">
+                     <span className="text-xs font-mono text-slate-500">{VPA}</span>
+                     <button 
+                       onClick={copyVpa}
+                       className="text-rose-600 hover:text-rose-700 transition-colors"
+                       title="Copy UPI ID"
+                     >
+                       {copied ? <Check size={16} /> : <Copy size={16} />}
+                     </button>
+                  </div>
+                  {copied && <span className="text-[10px] text-green-600 mt-1 font-bold">Copied!</span>}
+                  
+                  <div className="mt-4 flex items-start gap-2 bg-yellow-50 p-3 rounded-lg border border-yellow-100 w-full">
+                    <AlertCircle size={16} className="text-yellow-600 shrink-0 mt-0.5" />
+                    <p className="text-[10px] text-yellow-700 text-left leading-relaxed">
+                      <strong>Note:</strong> If you see "Self transfer not allowed", try using a different UPI app or ask a friend to pay on your behalf.
+                    </p>
+                  </div>
+                </div>
                 
                 <p className="text-[10px] text-center text-slate-400 mt-6 leading-relaxed">
-                  * <strong>Mobile Only:</strong> Please select the UPI app installed on your device. 
-                  <br/>
-                  * By clicking an option, the system will open the selected payment app and then proceed to the inquiry form.
+                  * By clicking a button, the system will attempt to open the app. If it fails, please use the QR code.
                 </p>
               </div>
             </div>
