@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Phone, MapPin, Send, ArrowLeft, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, CheckCircle, AlertTriangle, Shield, Clock, HeartHandshake } from 'lucide-react';
 
 interface ContactProps {
   prefillData: {
@@ -30,7 +30,6 @@ const Contact: React.FC<ContactProps> = ({ prefillData }) => {
 
   const [submitted, setSubmitted] = useState(false);
 
-  // Prefill data from payment step
   useEffect(() => {
     if (prefillData) {
       setSubmitted(false);
@@ -46,14 +45,12 @@ const Contact: React.FC<ContactProps> = ({ prefillData }) => {
     e.preventDefault();
     setSubmitted(true);
     
-    // Format matches for the Admin email
     const matchString = prefillData?.generatedMatches 
       ? prefillData.generatedMatches.map((m, i) => 
           `${i + 1}. Handle: ${m.handle}\n   Category: ${m.niche}\n   Age: ${m.age || 'N/A'}\n   Location: ${m.location || 'N/A'}\n   Job: ${m.occupation || 'N/A'}`
         ).join('\n\n')
       : 'No matches generated automatically.';
 
-    // Construct email body
     const subject = `New Inquiry: ${prefillData?.plan || 'General Service'} - ${formData.name}`;
     const body = `
 New Service Request from Duoplee Website
@@ -68,7 +65,7 @@ ORDER DETAILS
 --------------------------------
 Plan: ${prefillData?.plan || 'Not selected'}
 Price: ${prefillData?.price ? '₹' + prefillData.price : 'N/A'}
-Delivery Mode: ${prefillData?.mode || 'Standard'}
+Delivery: Standard (7 Days)
 Gender Preference: ${prefillData?.genderPreference || 'N/A'}
 
 SYSTEM GENERATED MATCHES
@@ -85,7 +82,6 @@ CONSENT
 User accepted policies: Yes
     `.trim();
 
-    // Use mailto to open email client
     window.location.href = `mailto:lokeshjaglan01@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
@@ -96,188 +92,177 @@ User accepted policies: Yes
 
   if (submitted) {
     return (
-        <div id="contact" className="min-h-[60vh] bg-white flex items-center justify-center py-20 px-4">
-            <div className="max-w-xl w-full text-center space-y-6 animate-fade-in-up">
-                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <CheckCircle className="w-10 h-10 text-green-600" />
+        <div id="contact" className="min-h-[70vh] flex items-center justify-center py-20 px-4 bg-slate-50 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-green-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+            
+            <div className="max-w-xl w-full text-center space-y-8 animate-fade-in-up relative z-10">
+                <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-green-100 text-green-500 border border-green-50">
+                    <CheckCircle className="w-12 h-12" />
                 </div>
                 
-                <h2 className="text-3xl font-serif font-bold text-slate-900">Inquiry Sent Successfully</h2>
+                <h2 className="text-4xl font-serif font-bold text-slate-900">Inquiry Sent</h2>
                 
-                <p className="text-slate-600 text-lg">
-                    Thank you, {formData.name}. We have received your payment details and preferences.
-                </p>
-                
-                <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl text-left space-y-4">
-                  <h4 className="font-bold text-slate-900 flex items-center gap-2">
-                    <Mail size={18} className="text-rose-600"/> What happens next?
+                <div className="bg-white/80 backdrop-blur-md border border-white/50 p-8 rounded-3xl text-left shadow-xl shadow-slate-200/50">
+                  <h4 className="font-bold text-slate-900 flex items-center gap-3 mb-4 text-lg">
+                    <div className="p-2 bg-rose-50 rounded-lg text-rose-600"><Clock size={20} /></div>
+                    Next Steps
                   </h4>
-                  <p className="text-slate-600 text-sm leading-relaxed">
-                    Based on your selected plan, our system has automatically allocated 
-                    <strong className="text-slate-900"> {prefillData?.generatedMatches?.length || 5} random profiles</strong>.
-                    These will be sent to <strong>{formData.email}</strong> via a secure professional email.
+                  <p className="text-slate-600 leading-relaxed mb-4">
+                    Thank you, <strong>{formData.name}</strong>. Your request has been securely logged.
+                    Our team is now verifying the {prefillData?.generatedMatches?.length || 5} profile matches allocated to your case.
                   </p>
-                  <p className="text-slate-600 text-sm">
-                    <strong>Expected Delivery:</strong> {prefillData?.mode === 'express' ? 'Within 24 Hours' : 'Within 7 Days'}
-                  </p>
+                  <div className="flex items-center gap-3 text-sm font-medium text-slate-500 bg-slate-50 p-4 rounded-xl">
+                     <Mail size={16} className="text-slate-400"/>
+                     <span>Report delivery to: <strong>{formData.email}</strong></span>
+                  </div>
                 </div>
 
-                {/* MANDATORY DISCLAIMER */}
-                <div className="bg-rose-50 border border-rose-100 p-6 rounded-2xl text-left">
-                   <div className="flex items-start gap-3">
-                     <AlertTriangle className="text-rose-600 shrink-0 mt-0.5" size={20} />
-                     <div className="space-y-2">
-                       <h4 className="font-bold text-rose-800 text-sm uppercase tracking-wide">Important Disclaimer</h4>
-                       <p className="text-rose-900/80 text-xs leading-relaxed font-medium">
-                         Please note that the Instagram profiles sent to you are selected randomly based on our database. 
-                         <strong>We do not guarantee that you will receive a response</strong> from these individuals. 
-                         The outcome completely depends on luck and mutual interest.
-                       </p>
-                       <p className="text-rose-900/80 text-xs leading-relaxed font-medium">
-                         If you do not find a match this time, you are welcome to try again on the website.
-                       </p>
-                     </div>
-                   </div>
+                <div className="flex justify-center">
+                    <button 
+                      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                      className="px-8 py-3 rounded-full bg-slate-900 text-white font-medium hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
+                    >
+                      Return Home
+                    </button>
                 </div>
-
-                <p className="text-slate-400 text-xs italic">
-                    Please ensure you clicked "Send" in your email app to finalize the administrative record.
-                </p>
-
-                <button 
-                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  className="inline-block mt-8 text-rose-600 font-semibold hover:text-rose-800"
-                >
-                  Return to Top
-                </button>
             </div>
         </div>
     );
   }
 
   return (
-    <div id="contact" className="bg-slate-50 py-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div id="contact" className="bg-white py-24 relative overflow-hidden">
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-slate-50 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        <div className="flex flex-col lg:flex-row gap-12">
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
             
           {/* Sidebar / Info */}
-          <div className="w-full lg:w-1/3 space-y-8">
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-                <h3 className="font-serif text-2xl font-bold text-slate-900 mb-6">Contact Us</h3>
-                <div className="space-y-6">
-                    <div className="flex items-start">
-                        <Mail className="w-5 h-5 text-rose-600 mt-1 mr-4" />
-                        <div>
-                            <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wide">Email</h4>
-                            <p className="text-slate-600">concierge@duoplee.com</p>
-                        </div>
+          <div className="w-full lg:w-5/12 space-y-10">
+            <div>
+                <h2 className="text-rose-600 font-bold tracking-widest uppercase text-sm mb-4">Get in Touch</h2>
+                <h3 className="font-serif text-4xl md:text-5xl font-bold text-slate-900 mb-6 leading-tight">We are here to help you find clarity.</h3>
+                <p className="text-slate-500 text-lg leading-relaxed">
+                    Have questions about our process? Need a custom consultation? 
+                    Our discreet team is ready to assist you.
+                </p>
+            </div>
+
+            <div className="grid gap-6">
+                <div className="flex items-start gap-4 p-6 rounded-2xl bg-slate-50 hover:bg-slate-100 transition-colors duration-300">
+                    <div className="p-3 bg-white rounded-xl shadow-sm text-rose-600"><Mail size={24} /></div>
+                    <div>
+                        <h4 className="font-bold text-slate-900 mb-1">Email Support</h4>
+                        <p className="text-slate-500 text-sm">concierge@duoplee.com</p>
+                        <p className="text-slate-400 text-xs mt-1">24/7 Response Time</p>
                     </div>
-                    <div className="flex items-start">
-                        <Phone className="w-5 h-5 text-rose-600 mt-1 mr-4" />
-                        <div>
-                            <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wide">Phone</h4>
-                            <p className="text-slate-600">+91 98765 43210</p>
-                        </div>
-                    </div>
-                    <div className="flex items-start">
-                        <MapPin className="w-5 h-5 text-rose-600 mt-1 mr-4" />
-                        <div>
-                            <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wide">Headquarters</h4>
-                            <p className="text-slate-600">Cyber City, Tower B<br/>New Delhi, India</p>
-                        </div>
+                </div>
+                
+                <div className="flex items-start gap-4 p-6 rounded-2xl bg-slate-50 hover:bg-slate-100 transition-colors duration-300">
+                    <div className="p-3 bg-white rounded-xl shadow-sm text-rose-600"><Shield size={24} /></div>
+                    <div>
+                        <h4 className="font-bold text-slate-900 mb-1">Privacy Guarantee</h4>
+                        <p className="text-slate-500 text-sm">All communications are end-to-end encrypted and strictly confidential.</p>
                     </div>
                 </div>
             </div>
 
             {prefillData && (
-                <div className="bg-rose-900 text-white p-8 rounded-2xl shadow-lg relative overflow-hidden animate-fade-in-up">
+                <div className="bg-slate-900 text-white p-8 rounded-3xl shadow-2xl shadow-slate-900/20 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-rose-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-rose-600/30 transition-colors duration-700"></div>
+                    
                     <div className="relative z-10">
-                        <h3 className="font-serif text-xl font-bold mb-4 text-rose-100">Order Summary</h3>
-                        <div className="space-y-2 text-sm text-rose-200">
-                            <div className="flex justify-between">
-                                <span>Plan:</span>
-                                <span className="font-bold text-white">{prefillData.plan}</span>
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm"><HeartHandshake size={20} className="text-rose-400" /></div>
+                            <h3 className="font-serif text-xl font-bold">Order Summary</h3>
+                        </div>
+                        
+                        <div className="space-y-4 text-sm text-slate-300">
+                            <div className="flex justify-between items-center py-2 border-b border-white/10">
+                                <span>Selected Plan</span>
+                                <span className="font-bold text-white text-base">{prefillData.plan}</span>
                             </div>
-                            <div className="flex justify-between">
-                                <span>Preference:</span>
-                                <span className="font-bold text-white capitalize">{prefillData.genderPreference}</span>
+                            <div className="flex justify-between items-center py-2 border-b border-white/10">
+                                <span>Preference</span>
+                                <span className="font-bold text-white capitalize flex items-center gap-2">
+                                    <span className={`w-2 h-2 rounded-full ${prefillData.genderPreference === 'female' ? 'bg-rose-400' : 'bg-blue-400'}`}></span>
+                                    {prefillData.genderPreference}
+                                </span>
                             </div>
-                            <div className="flex justify-between">
-                                <span>Delivery:</span>
-                                <span className="font-bold text-white capitalize">{prefillData.mode}</span>
-                            </div>
-                            <div className="w-full h-px bg-rose-800 my-3"></div>
-                            <div className="flex justify-between text-lg">
-                                <span>Total:</span>
-                                <span className="font-bold text-white">₹{prefillData.price?.toLocaleString()}</span>
+                            <div className="pt-2 flex justify-between items-end">
+                                <span className="text-xs uppercase tracking-wider text-slate-500 font-bold">Total Paid</span>
+                                <span className="font-serif text-3xl font-bold text-white">₹{prefillData.price?.toLocaleString()}</span>
                             </div>
                         </div>
                     </div>
-                    <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-rose-500 rounded-full blur-3xl opacity-20"></div>
                 </div>
             )}
           </div>
 
           {/* Main Form */}
-          <div className="w-full lg:w-2/3">
-            <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/60 p-8 md:p-12 border border-slate-100">
-                <h2 className="text-3xl font-serif font-bold text-slate-900 mb-2">Secure Inquiry</h2>
-                <p className="text-slate-500 mb-8">Please provide your details below. All information is encrypted and handled with strict confidentiality.</p>
+          <div className="w-full lg:w-7/12">
+            <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 p-8 md:p-12 border border-slate-100 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-rose-500 via-purple-500 to-rose-500"></div>
+                
+                <h2 className="text-2xl font-bold text-slate-900 mb-8 flex items-center gap-3">
+                    Secure Inquiry Form
+                    {prefillData && <span className="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-bold uppercase tracking-wide">Payment Verified</span>}
+                </h2>
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Full Name</label>
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Full Name</label>
                             <input
                                 type="text"
                                 name="name"
                                 required
                                 value={formData.name}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 bg-slate-50 rounded-lg border border-slate-200 focus:bg-white focus:ring-2 focus:ring-rose-500 focus:border-transparent transition outline-none text-slate-900"
+                                className="w-full px-5 py-4 bg-slate-50 rounded-xl border border-slate-200 focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all outline-none font-medium text-slate-900 placeholder:text-slate-400"
                                 placeholder="e.g. Rahul Verma"
                             />
                         </div>
-                        <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Email Address</label>
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
                             <input
                                 type="email"
                                 name="email"
                                 required
                                 value={formData.email}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 bg-slate-50 rounded-lg border border-slate-200 focus:bg-white focus:ring-2 focus:ring-rose-500 focus:border-transparent transition outline-none text-slate-900"
+                                className="w-full px-5 py-4 bg-slate-50 rounded-xl border border-slate-200 focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all outline-none font-medium text-slate-900 placeholder:text-slate-400"
                                 placeholder="you@example.com"
                             />
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Phone Number</label>
+                    <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Phone Number</label>
                         <input
                             type="tel"
                             name="phone"
                             value={formData.phone}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 bg-slate-50 rounded-lg border border-slate-200 focus:bg-white focus:ring-2 focus:ring-rose-500 focus:border-transparent transition outline-none text-slate-900"
+                            className="w-full px-5 py-4 bg-slate-50 rounded-xl border border-slate-200 focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all outline-none font-medium text-slate-900 placeholder:text-slate-400"
                             placeholder="+91..."
                         />
                     </div>
 
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Additional Details</label>
+                    <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Target Details / Specific Requirements</label>
                         <textarea
                             name="details"
                             rows={4}
                             value={formData.details}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 bg-slate-50 rounded-lg border border-slate-200 focus:bg-white focus:ring-2 focus:ring-rose-500 focus:border-transparent transition outline-none text-slate-900 resize-none"
-                            placeholder="Please describe any specific requirements or information about the person you are looking for..."
+                            className="w-full px-5 py-4 bg-slate-50 rounded-xl border border-slate-200 focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all outline-none font-medium text-slate-900 resize-none placeholder:text-slate-400 leading-relaxed"
+                            placeholder="Please provide any known details about the person (location, age, workplace) or describe your ideal match criteria..."
                         ></textarea>
                     </div>
 
-                    <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
+                    <div className="flex items-start gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-100">
                         <input 
                             type="checkbox" 
                             id="consent" 
@@ -285,18 +270,23 @@ User accepted policies: Yes
                             required 
                             checked={formData.consent}
                             onChange={(e) => setFormData({...formData, consent: e.target.checked})}
-                            className="mt-1 w-4 h-4 text-rose-600 border-gray-300 rounded focus:ring-rose-500" 
+                            className="mt-1 w-5 h-5 text-rose-600 border-gray-300 rounded focus:ring-rose-500 cursor-pointer" 
                         />
-                        <label htmlFor="consent" className="text-xs text-slate-500 leading-relaxed cursor-pointer">
-                            I acknowledge that this is an investigative service. Results depend on public data availability. I understand that payment is for the research effort and time, and specific outcomes (such as a guaranteed date or relationship) cannot be promised.
+                        <label htmlFor="consent" className="text-xs text-slate-500 leading-relaxed cursor-pointer select-none">
+                            <strong>Service Acknowledgment:</strong> I understand that Duoplee is an investigative research service. 
+                            Results rely on public records and social footprint data. Payment covers the expert time and tools used 
+                            for the search, not a guaranteed relationship outcome.
                         </label>
                     </div>
 
                     <button
                         type="submit"
-                        className="w-full bg-rose-600 text-white font-bold py-4 rounded-xl hover:bg-rose-700 transition duration-300 flex items-center justify-center gap-2 shadow-xl shadow-rose-200"
+                        className="group w-full bg-slate-900 text-white font-bold py-5 rounded-xl hover:bg-slate-800 transition-all duration-300 flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl hover:-translate-y-1"
                     >
-                        Submit Request <Send size={18} />
+                        <span>Submit Secure Request</span> 
+                        <div className="bg-white/10 p-1 rounded-full group-hover:translate-x-1 transition-transform">
+                             <Send size={16} />
+                        </div>
                     </button>
                 </form>
             </div>

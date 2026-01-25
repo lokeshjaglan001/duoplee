@@ -1,10 +1,9 @@
 import React from 'react';
-import { ArrowRight, Search, Heart, ShieldCheck, Clock, CheckCircle } from 'lucide-react';
+import { ArrowRight, Search, ShieldCheck, Microscope, CheckCircle } from 'lucide-react';
 
 const Home: React.FC = () => {
   return (
-
-    <div id="home" className="flex flex-col w-full">
+    <div id="home" className="flex flex-col w-full overflow-hidden">
       {/* Hero Section */}
       <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background Image with Professional Overlay */}
@@ -31,7 +30,7 @@ const Home: React.FC = () => {
           </h1>
           
           <p className="text-lg md:text-xl text-slate-200 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
-            We are specialized in high-precision social discovery and partner verification. 
+            We specialize in high-precision social discovery and partner verification. 
             Whether you are searching for a missed connection or your life partner, we bridge the gap.
           </p>
           
@@ -51,7 +50,7 @@ const Home: React.FC = () => {
           </div>
 
           {/* Trust Indicators */}
-          <div className="mt-16 flex justify-center gap-8 text-white/60 text-sm font-medium">
+          <div className="mt-16 flex justify-center gap-8 text-white/60 text-sm font-medium flex-wrap">
              <div className="flex items-center gap-2"><CheckCircle size={16} className="text-rose-400" /> 100% Confidential</div>
              <div className="flex items-center gap-2"><CheckCircle size={16} className="text-rose-400" /> Human Verified</div>
              <div className="flex items-center gap-2"><CheckCircle size={16} className="text-rose-400" /> Secure Data</div>
@@ -82,14 +81,14 @@ const Home: React.FC = () => {
             {/* Feature 2 */}
             <div className="group p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:border-rose-100 hover:shadow-xl hover:shadow-rose-100/50 transition-all duration-500 relative overflow-hidden">
                <div className="absolute top-0 right-0 p-4 opacity-5">
-                 <Clock size={120} />
+                 <Microscope size={120} />
                </div>
               <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500 relative z-10">
-                <Clock className="text-rose-600" size={28} />
+                <Microscope className="text-rose-600" size={28} />
               </div>
-              <h4 className="text-xl font-bold text-slate-900 mb-4 relative z-10">24-Hour Express</h4>
+              <h4 className="text-xl font-bold text-slate-900 mb-4 relative z-10">Deep Dive Verification</h4>
               <p className="text-slate-600 leading-relaxed relative z-10">
-                Time is of the essence in matters of the heart. Our priority tier ensures dedicated resources are assigned to your case immediately for rapid results.
+                We don't rush perfection. Our 7-day standard process ensures every potential match is cross-referenced, verified, and vetted for authenticity.
               </p>
             </div>
 

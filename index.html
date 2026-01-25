@@ -34,8 +34,15 @@
                 950: '#020617',
               }
             },
-            backgroundImage: {
-              'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+            animation: {
+              'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            },
+            keyframes: {
+              fadeInUp: {
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              }
             }
           }
         }
@@ -44,6 +51,7 @@
     <script type="importmap">
     {
       "imports": {
+        "react-dom/client": "https://esm.sh/react-dom@^19.2.3/client",
         "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
         "react/": "https://esm.sh/react@^19.2.3/",
         "react": "https://esm.sh/react@^19.2.3",
@@ -52,10 +60,9 @@
       }
     }
     </script>
-  <link rel="stylesheet" href="/index.css">
-</head>
-  <body class="bg-white text-slate-800 font-sans antialiased selection:bg-rose-100 selection:text-rose-900">
+  </head>
+  <body class="bg-white text-slate-800 font-sans antialiased selection:bg-rose-100 selection:text-rose-900 overflow-x-hidden">
     <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
-</body>
+    <script type="module" src="./index.tsx"></script>
+  </body>
 </html>
