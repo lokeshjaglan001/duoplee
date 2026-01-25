@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Phone, MapPin, Send, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, ArrowLeft, CheckCircle, AlertTriangle } from 'lucide-react';
 
 interface ContactProps {
   prefillData: {
@@ -9,6 +9,13 @@ interface ContactProps {
     genderPreference?: string;
     payerName?: string;
     payerEmail?: string;
+    generatedMatches?: { 
+      handle: string; 
+      niche: string;
+      age?: number;
+      location?: string;
+      occupation?: string;
+    }[];
   } | null;
 }
 
@@ -39,6 +46,13 @@ const Contact: React.FC<ContactProps> = ({ prefillData }) => {
     e.preventDefault();
     setSubmitted(true);
     
+    // Format matches for the Admin email
+    const matchString = prefillData?.generatedMatches 
+      ? prefillData.generatedMatches.map((m, i) => 
+          `${i + 1}. Handle: ${m.handle}\n   Category: ${m.niche}\n   Age: ${m.age || 'N/A'}\n   Location: ${m.location || 'N/A'}\n   Job: ${m.occupation || 'N/A'}`
+        ).join('\n\n')
+      : 'No matches generated automatically.';
+
     // Construct email body
     const subject = `New Inquiry: ${prefillData?.plan || 'General Service'} - ${formData.name}`;
     const body = `
@@ -56,6 +70,11 @@ Plan: ${prefillData?.plan || 'Not selected'}
 Price: ${prefillData?.price ? '₹' + prefillData.price : 'N/A'}
 Delivery Mode: ${prefillData?.mode || 'Standard'}
 Gender Preference: ${prefillData?.genderPreference || 'N/A'}
+
+SYSTEM GENERATED MATCHES
+(Admin: Send these details to the client)
+--------------------------------
+${matchString}
 
 ADDITIONAL DETAILS
 --------------------------------
@@ -78,17 +97,53 @@ User accepted policies: Yes
   if (submitted) {
     return (
         <div id="contact" className="min-h-[60vh] bg-white flex items-center justify-center py-20 px-4">
-            <div className="max-w-md w-full text-center space-y-6 animate-fade-in-up">
+            <div className="max-w-xl w-full text-center space-y-6 animate-fade-in-up">
                 <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <CheckCircle className="w-10 h-10 text-green-600" />
                 </div>
-                <h2 className="text-3xl font-serif font-bold text-slate-900">Inquiry Sent</h2>
-                <p className="text-slate-600">
-                    Thank you, {formData.name}. Your email client should have opened with the order details.
+                
+                <h2 className="text-3xl font-serif font-bold text-slate-900">Inquiry Sent Successfully</h2>
+                
+                <p className="text-slate-600 text-lg">
+                    Thank you, {formData.name}. We have received your payment details and preferences.
                 </p>
-                <p className="text-slate-500 text-sm bg-slate-50 p-4 rounded-lg">
-                    Please ensure you clicked "Send" in your email app to complete the process. We will contact you at {formData.email} shortly.
+                
+                <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl text-left space-y-4">
+                  <h4 className="font-bold text-slate-900 flex items-center gap-2">
+                    <Mail size={18} className="text-rose-600"/> What happens next?
+                  </h4>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    Based on your selected plan, our system has automatically allocated 
+                    <strong className="text-slate-900"> {prefillData?.generatedMatches?.length || 5} random profiles</strong>.
+                    These will be sent to <strong>{formData.email}</strong> via a secure professional email.
+                  </p>
+                  <p className="text-slate-600 text-sm">
+                    <strong>Expected Delivery:</strong> {prefillData?.mode === 'express' ? 'Within 24 Hours' : 'Within 7 Days'}
+                  </p>
+                </div>
+
+                {/* MANDATORY DISCLAIMER */}
+                <div className="bg-rose-50 border border-rose-100 p-6 rounded-2xl text-left">
+                   <div className="flex items-start gap-3">
+                     <AlertTriangle className="text-rose-600 shrink-0 mt-0.5" size={20} />
+                     <div className="space-y-2">
+                       <h4 className="font-bold text-rose-800 text-sm uppercase tracking-wide">Important Disclaimer</h4>
+                       <p className="text-rose-900/80 text-xs leading-relaxed font-medium">
+                         Please note that the Instagram profiles sent to you are selected randomly based on our database. 
+                         <strong>We do not guarantee that you will receive a response</strong> from these individuals. 
+                         The outcome completely depends on luck and mutual interest.
+                       </p>
+                       <p className="text-rose-900/80 text-xs leading-relaxed font-medium">
+                         If you do not find a match this time, you are welcome to try again on the website.
+                       </p>
+                     </div>
+                   </div>
+                </div>
+
+                <p className="text-slate-400 text-xs italic">
+                    Please ensure you clicked "Send" in your email app to finalize the administrative record.
                 </p>
+
                 <button 
                   onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                   className="inline-block mt-8 text-rose-600 font-semibold hover:text-rose-800"
@@ -122,7 +177,7 @@ User accepted policies: Yes
                         <Phone className="w-5 h-5 text-rose-600 mt-1 mr-4" />
                         <div>
                             <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wide">Phone</h4>
-                            <p className="text-slate-600">+91 92546 11524</p>
+                            <p className="text-slate-600">+91 98765 43210</p>
                         </div>
                     </div>
                     <div className="flex items-start">

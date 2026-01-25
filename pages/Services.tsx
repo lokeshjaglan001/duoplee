@@ -6,6 +6,30 @@ interface ServicesProps {
   onPlanPaymentComplete: (data: any) => void;
 }
 
+// --- CONFIGURATION: PASTE YOUR PROFILES HERE ---
+const INSTAGRAM_PROFILES_DATABASE = [
+  { handle: '@travel_wanderer_99', niche: 'Travel', age: 26, location: 'Mumbai', occupation: 'Marketing Executive' },
+  { handle: '@fitness_guru_22', niche: 'Fitness', age: 29, location: 'Delhi', occupation: 'Personal Trainer' },
+  { handle: '@bookworm_sarah', niche: 'Literature', age: 25, location: 'Bangalore', occupation: 'Content Writer' },
+  { handle: '@tech_enthusiast_x', niche: 'Tech', age: 31, location: 'Hyderabad', occupation: 'Software Engineer' },
+  { handle: '@coffee_lover_delhi', niche: 'Lifestyle', age: 27, location: 'New Delhi', occupation: 'Architect' },
+  { handle: '@artistic_soul_mumbai', niche: 'Art', age: 24, location: 'Pune', occupation: 'Graphic Designer' },
+  { handle: '@foodie_adventures_in', niche: 'Food', age: 28, location: 'Chandigarh', occupation: 'Restaurateur' },
+  { handle: '@music_vibes_only', niche: 'Music', age: 23, location: 'Goa', occupation: 'Musician' },
+  { handle: '@startup_hustler_bg', niche: 'Business', age: 32, location: 'Bangalore', occupation: 'Product Manager' },
+  { handle: '@nature_clicks_official', niche: 'Photography', age: 30, location: 'Manali', occupation: 'Photographer' },
+  { handle: '@fashion_ista_diva', niche: 'Fashion', age: 26, location: 'Mumbai', occupation: 'Fashion Stylist' },
+  { handle: '@gamer_pro_zone', niche: 'Gaming', age: 22, location: 'Hyderabad', occupation: 'Streamer' },
+  { handle: '@yoga_peace_mind', niche: 'Wellness', age: 33, location: 'Rishikesh', occupation: 'Yoga Instructor' },
+  { handle: '@pet_lover_club', niche: 'Animals', age: 27, location: 'Chennai', occupation: 'Veterinarian' },
+  { handle: '@cinema_buff_central', niche: 'Movies', age: 29, location: 'Mumbai', occupation: 'Assistant Director' },
+  { handle: '@finance_wizard_01', niche: 'Finance', age: 34, location: 'Gurgaon', occupation: 'Investment Banker' },
+  { handle: '@medical_life_dr', niche: 'Health', age: 30, location: 'Delhi', occupation: 'Doctor' },
+  { handle: '@legal_eagle_law', niche: 'Law', age: 28, location: 'Mumbai', occupation: 'Corporate Lawyer' },
+  { handle: '@chef_master_ind', niche: 'Culinary', age: 31, location: 'Kolkata', occupation: 'Head Chef' },
+  { handle: '@dance_rhythm_soul', niche: 'Arts', age: 25, location: 'Bangalore', occupation: 'Choreographer' }
+];
+
 const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
   const [deliveryMode, setDeliveryMode] = useState<DeliveryMode>('standard');
   const [gender, setGender] = useState<string>('');
@@ -18,12 +42,13 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
   const plans = [
     {
       id: 'basic',
-      title: 'Kind Search',
+      title: 'Social Discovery',
       icon: Search,
-      price: 1000,
-      description: 'Ideal for getting a partner for casual dating and light connections.',
+      price: 1,
+      matchCount: 3, // How many profiles to give
+      description: 'Ideal for finding a specific person from a physical encounter or limited information.',
       features: [
-        'Instagram ID Retrieval',
+        '3 Random Instagram Matches',
         'Profile Verification',
         'Public Data Summary',
         'Secure Email Delivery'
@@ -36,9 +61,10 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
       title: 'Partner Search',
       icon: Heart,
       price: 5000,
+      matchCount: 7, // How many profiles to give
       description: 'Comprehensive search for serious relationship seekers looking for compatibility.',
       features: [
-        'Verified Social Profiles',
+        '7 Random Instagram Matches',
         'Relationship Status Check',
         'Interest & Hobby Analysis',
         'Digital Footprint Report',
@@ -52,9 +78,10 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
       title: 'Soulmate Protocol',
       icon: Star,
       price: 10000,
+      matchCount: 15, // How many profiles to give
       description: 'The ultimate deep-dive for high-stakes matchmaking and complete peace of mind.',
       features: [
-        'Full Digital Background Check',
+        '15 Random Instagram Matches',
         'Detailed Personality Profile',
         'Family & Lifestyle Overview',
         'In-depth Compatibility Report',
@@ -66,7 +93,7 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
     }
   ];
 
-  const getPrice = (base: number) => deliveryMode === 'express' ? base + 500 : base;
+  const getPrice = (base: number) => deliveryMode === 'express' ? base + 5 : base;
 
   const handlePlanClick = (plan: any) => {
     if (!gender) {
@@ -80,6 +107,14 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
 
   const isPaymentFormValid = paymentForm.name.trim().length > 0 && paymentForm.email.trim().includes('@');
 
+  // Logic to randomly select profiles
+  const getRandomProfiles = (count: number) => {
+    // Shuffle array
+    const shuffled = [...INSTAGRAM_PROFILES_DATABASE].sort(() => 0.5 - Math.random());
+    // Get sub-array of first n elements
+    return shuffled.slice(0, count);
+  };
+
   const handlePayClick = (e: React.MouseEvent) => {
     if (!isPaymentFormValid) {
       e.preventDefault();
@@ -90,6 +125,10 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
     setTimeout(() => {
       if (selectedPlan) {
         setShowPaymentModal(false);
+
+        // Generate the random matches immediately
+        const matches = getRandomProfiles(selectedPlan.matchCount);
+
         onPlanPaymentComplete({
           plan: selectedPlan.title,
           price: getPrice(selectedPlan.price),
@@ -97,7 +136,8 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
           genderPreference: gender,
           paymentInitiated: true,
           payerName: paymentForm.name,
-          payerEmail: paymentForm.email
+          payerEmail: paymentForm.email,
+          generatedMatches: matches // Pass these to the contact form/email logic
         });
         
         // Scroll to contact section
@@ -342,7 +382,7 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
                 <div className="space-y-3">
                   {/* The actual payment link uses the number as VPA */}
                   <a 
-                    href={isPaymentFormValid ? `upi://pay?pa=duoplee@okaxis&pn=Duoplee&am=${getPrice(selectedPlan.price)}&cu=INR` : '#'}
+                    href={isPaymentFormValid ? `upi://pay?pa=8930963832@okaxis&pn=Duoplee&am=${getPrice(selectedPlan.price)}&cu=INR` : '#'}
                     onClick={handlePayClick}
                     className={`w-full py-4 rounded-xl font-bold text-center transition-all flex items-center justify-center gap-2 shadow-lg ${
                       isPaymentFormValid 
