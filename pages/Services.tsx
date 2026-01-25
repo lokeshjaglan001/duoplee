@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, Zap, Star, Shield, Search, Heart, X, Smartphone, ArrowRight, CheckCircle, User, Mail } from 'lucide-react';
+import { Check, Zap, Star, Shield, Search, Heart, X, Smartphone, ArrowRight, CheckCircle, User, Mail, CreditCard } from 'lucide-react';
 import { DeliveryMode } from '../types';
 
 interface ServicesProps {
@@ -44,7 +44,7 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
       id: 'basic',
       title: 'Social Discovery',
       icon: Search,
-      price: 1,
+      price: 1000,
       matchCount: 3, // How many profiles to give
       description: 'Ideal for finding a specific person from a physical encounter or limited information.',
       features: [
@@ -90,10 +90,10 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
       ],
       cta: 'Get Premium',
       highlight: false
-    }
+    },
   ];
 
-  const getPrice = (base: number) => deliveryMode === 'express' ? base + 5 : base;
+  const getPrice = (base: number) => deliveryMode === 'express' ? base + 500 : base;
 
   const handlePlanClick = (plan: any) => {
     if (!gender) {
@@ -147,6 +147,17 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
         }
       }
     }, 5000); // 5 second delay to allow app to open
+  };
+
+  const getPaymentLink = (app: 'generic' | 'gpay' | 'phonepe' | 'paytm') => {
+    const base = `pa=8930963832@okaxis&pn=Duoplee&am=${getPrice(selectedPlan?.price || 0)}&cu=INR`;
+    
+    switch (app) {
+        case 'gpay': return `gpay://upi/pay?${base}`;
+        case 'phonepe': return `phonepe://pay?${base}`;
+        case 'paytm': return `paytmmp://pay?${base}`;
+        default: return `upi://pay?${base}`;
+    }
   };
 
   return (
@@ -379,25 +390,60 @@ const Services: React.FC<ServicesProps> = ({ onPlanPaymentComplete }) => {
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  {/* The actual payment link uses the number as VPA */}
-                  <a 
-                    href={isPaymentFormValid ? `upi://pay?pa=8930963832@okaxis&pn=Duoplee&am=${getPrice(selectedPlan.price)}&cu=INR` : '#'}
-                    onClick={handlePayClick}
-                    className={`w-full py-4 rounded-xl font-bold text-center transition-all flex items-center justify-center gap-2 shadow-lg ${
-                      isPaymentFormValid 
-                      ? 'bg-slate-900 text-white hover:bg-slate-800 cursor-pointer' 
-                      : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                    }`}
-                  >
-                    Pay Now <ArrowRight size={18} />
-                  </a>
+                <div className="space-y-4">
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Select Payment App</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <a 
+                      href={isPaymentFormValid ? getPaymentLink('gpay') : '#'}
+                      onClick={handlePayClick}
+                      className={`py-3 px-4 rounded-xl font-bold text-sm text-center border transition-all ${
+                         isPaymentFormValid 
+                         ? 'border-slate-200 hover:border-slate-800 hover:bg-slate-50 text-slate-700 cursor-pointer' 
+                         : 'border-slate-100 bg-slate-50 text-slate-300 cursor-not-allowed'
+                      }`}
+                    >
+                      Google Pay
+                    </a>
+                    <a 
+                      href={isPaymentFormValid ? getPaymentLink('phonepe') : '#'}
+                      onClick={handlePayClick}
+                      className={`py-3 px-4 rounded-xl font-bold text-sm text-center border transition-all ${
+                         isPaymentFormValid 
+                         ? 'border-slate-200 hover:border-purple-500 hover:bg-purple-50 text-purple-700 cursor-pointer' 
+                         : 'border-slate-100 bg-slate-50 text-slate-300 cursor-not-allowed'
+                      }`}
+                    >
+                      PhonePe
+                    </a>
+                    <a 
+                      href={isPaymentFormValid ? getPaymentLink('paytm') : '#'}
+                      onClick={handlePayClick}
+                      className={`py-3 px-4 rounded-xl font-bold text-sm text-center border transition-all ${
+                         isPaymentFormValid 
+                         ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50 text-blue-700 cursor-pointer' 
+                         : 'border-slate-100 bg-slate-50 text-slate-300 cursor-not-allowed'
+                      }`}
+                    >
+                      Paytm
+                    </a>
+                    <a 
+                      href={isPaymentFormValid ? getPaymentLink('generic') : '#'}
+                      onClick={handlePayClick}
+                      className={`py-3 px-4 rounded-xl font-bold text-sm text-center border transition-all ${
+                         isPaymentFormValid 
+                         ? 'border-slate-200 hover:border-slate-800 hover:bg-slate-50 text-slate-700 cursor-pointer' 
+                         : 'border-slate-100 bg-slate-50 text-slate-300 cursor-not-allowed'
+                      }`}
+                    >
+                      Other UPI
+                    </a>
+                  </div>
                 </div>
                 
                 <p className="text-[10px] text-center text-slate-400 mt-6 leading-relaxed">
-                  * <strong>Mobile Only:</strong> This button works with installed UPI apps (GPay, PhonePe, etc). 
+                  * <strong>Mobile Only:</strong> Please select the UPI app installed on your device. 
                   <br/>
-                  * By clicking "Pay Now", the system will open your payment app and then proceed to the inquiry form.
+                  * By clicking an option, the system will open the selected payment app and then proceed to the inquiry form.
                 </p>
               </div>
             </div>
