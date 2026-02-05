@@ -413,7 +413,7 @@ const PaymentPage = ({ user, onSuccess, onLogout }: any) => {
   const hasClickedPay = useRef(false);
   const fallbackTimerRef = useRef<any>(null);
 
-  const upiId = "humanshujaglan@okicici";
+  const upiId = "8168098633@ybl";
   const amount = PREMIUM_PRICE;
   const name = "Duoplee";
 
