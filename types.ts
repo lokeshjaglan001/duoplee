@@ -1,6 +1,20 @@
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  isPremium: boolean;
+}
+
+export enum ViewState {
+  LANDING = 'LANDING',
+  AUTH = 'AUTH',
+  PAYMENT = 'PAYMENT',
+  CHAT = 'CHAT'
+}
+
 export enum Role {
   USER = 'user',
-  MODEL = 'model',
+  MODEL = 'model'
 }
 
 export interface Message {
@@ -14,25 +28,5 @@ export interface ChatSession {
   id: string;
   title: string;
   messages: Message[];
-  createdAt: number;
   lastUpdated: number;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  isPremium: boolean;
-  createdAt: number;
-}
-
-export enum ViewState {
-  LANDING = 'LANDING',
-  AUTH = 'AUTH',
-  PAYMENT = 'PAYMENT',
-  CHAT = 'CHAT',
-}
-
-export interface GenerateResponse {
-  text: string;
 }

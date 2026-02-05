@@ -1,132 +1,118 @@
-import { User, ChatSession, Message, Role } from "../types";
+import { User, ChatSession } from '../types';
 
 const STORAGE_KEYS = {
-  USER: 'duoplee_user_session',
-  USERS_DB: 'duoplee_users_db',
-  CHATS: 'duoplee_chats_',
+  CURRENT_USER: 'duoplee_current_user',
+  USERS: 'duoplee_users',
+  CHATS_PREFIX: 'duoplee_chats_'
 };
 
-// --- User Management ---
-
-export const registerUser = (email: string, name: string, password: string): User => {
-  const usersRaw = localStorage.getItem(STORAGE_KEYS.USERS_DB);
-  const users = usersRaw ? JSON.parse(usersRaw) : {};
-
-  if (users[email]) {
-    throw new Error("User already exists.");
+// User Management
+export function registerUser(email: string, name: string, password: string): User {
+  const users = getAllUsers();
+  
+  if (users.find(u => u.email === email)) {
+    throw new Error('Email already registered');
   }
 
   const newUser: User = {
     id: Date.now().toString(),
     email,
     name,
-    isPremium: false,
-    createdAt: Date.now(),
+    isPremium: false
   };
 
-  users[email] = { ...newUser, password }; // Store simple mock password
-  localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(users));
+  users.push(newUser);
+  localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+  localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(newUser));
   
-  // Auto login
-  localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(newUser));
+  // Store password separately (in production, use proper encryption)
+  localStorage.setItem(`duoplee_pwd_${newUser.id}`, password);
+  
   return newUser;
-};
+}
 
-export const loginUser = (email: string, password: string): User => {
-  const usersRaw = localStorage.getItem(STORAGE_KEYS.USERS_DB);
-  const users = usersRaw ? JSON.parse(usersRaw) : {};
+export function loginUser(email: string, password: string): User {
+  const users = getAllUsers();
+  const user = users.find(u => u.email === email);
   
-  const user = users[email];
-  if (!user || user.password !== password) {
-    throw new Error("Invalid email or password.");
+  if (!user) {
+    throw new Error('Invalid email or password');
   }
 
-  const sessionUser: User = {
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    isPremium: user.isPremium,
-    createdAt: user.createdAt
-  };
-
-  localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(sessionUser));
-  return sessionUser;
-};
-
-export const getCurrentUser = (): User | null => {
-  const userRaw = localStorage.getItem(STORAGE_KEYS.USER);
-  return userRaw ? JSON.parse(userRaw) : null;
-};
-
-export const logoutUser = () => {
-  localStorage.removeItem(STORAGE_KEYS.USER);
-};
-
-export const upgradeUserToPremium = (userId: string) => {
-  const usersRaw = localStorage.getItem(STORAGE_KEYS.USERS_DB);
-  const users = usersRaw ? JSON.parse(usersRaw) : {};
-  
-  // Find key by id (inefficient but fine for mock)
-  const email = Object.keys(users).find(key => users[key].id === userId);
-  
-  if (email) {
-    users[email].isPremium = true;
-    localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(users));
-    
-    // Update current session
-    const currentUser = getCurrentUser();
-    if (currentUser && currentUser.id === userId) {
-      currentUser.isPremium = true;
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(currentUser));
-    }
+  const storedPassword = localStorage.getItem(`duoplee_pwd_${user.id}`);
+  if (storedPassword !== password) {
+    throw new Error('Invalid email or password');
   }
-};
 
-export const deleteAccount = (userId: string) => {
-  const usersRaw = localStorage.getItem(STORAGE_KEYS.USERS_DB);
-  const users = usersRaw ? JSON.parse(usersRaw) : {};
-  const email = Object.keys(users).find(key => users[key].id === userId);
+  localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+  return user;
+}
 
-  if (email) {
-    delete users[email];
-    localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(users));
-    localStorage.removeItem(STORAGE_KEYS.USER);
-    localStorage.removeItem(STORAGE_KEYS.CHATS + userId);
+export function getCurrentUser(): User | null {
+  const userData = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+  return userData ? JSON.parse(userData) : null;
+}
+
+export function logoutUser(): void {
+  localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+}
+
+export function upgradeUserToPremium(userId: string): void {
+  const users = getAllUsers();
+  const userIndex = users.findIndex(u => u.id === userId);
+  
+  if (userIndex !== -1) {
+    users[userIndex].isPremium = true;
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(users[userIndex]));
   }
-};
+}
 
-// --- Chat Management ---
+export function deleteAccount(userId: string): void {
+  const users = getAllUsers();
+  const filteredUsers = users.filter(u => u.id !== userId);
+  
+  localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(filteredUsers));
+  localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+  localStorage.removeItem(`duoplee_pwd_${userId}`);
+  localStorage.removeItem(`${STORAGE_KEYS.CHATS_PREFIX}${userId}`);
+}
 
-export const getUserChats = (userId: string): ChatSession[] => {
-  const chatsRaw = localStorage.getItem(STORAGE_KEYS.CHATS + userId);
-  return chatsRaw ? JSON.parse(chatsRaw) : [];
-};
+function getAllUsers(): User[] {
+  const usersData = localStorage.getItem(STORAGE_KEYS.USERS);
+  return usersData ? JSON.parse(usersData) : [];
+}
 
-export const saveChat = (userId: string, session: ChatSession) => {
+// Chat Management
+export function getUserChats(userId: string): ChatSession[] {
+  const chatsData = localStorage.getItem(`${STORAGE_KEYS.CHATS_PREFIX}${userId}`);
+  return chatsData ? JSON.parse(chatsData) : [];
+}
+
+export function saveChat(userId: string, session: ChatSession): void {
   const chats = getUserChats(userId);
   const existingIndex = chats.findIndex(c => c.id === session.id);
   
-  if (existingIndex >= 0) {
+  if (existingIndex !== -1) {
     chats[existingIndex] = session;
   } else {
     chats.unshift(session);
   }
   
-  localStorage.setItem(STORAGE_KEYS.CHATS + userId, JSON.stringify(chats));
-};
+  localStorage.setItem(`${STORAGE_KEYS.CHATS_PREFIX}${userId}`, JSON.stringify(chats));
+}
 
-export const createNewSession = (): ChatSession => {
+export function deleteChatSession(userId: string, sessionId: string): void {
+  const chats = getUserChats(userId);
+  const filteredChats = chats.filter(c => c.id !== sessionId);
+  localStorage.setItem(`${STORAGE_KEYS.CHATS_PREFIX}${userId}`, JSON.stringify(filteredChats));
+}
+
+export function createNewSession(): ChatSession {
   return {
     id: Date.now().toString(),
     title: 'New Conversation',
     messages: [],
-    createdAt: Date.now(),
-    lastUpdated: Date.now(),
+    lastUpdated: Date.now()
   };
-};
-
-export const deleteChatSession = (userId: string, sessionId: string) => {
-    let chats = getUserChats(userId);
-    chats = chats.filter(c => c.id !== sessionId);
-    localStorage.setItem(STORAGE_KEYS.CHATS + userId, JSON.stringify(chats));
-};
+}
