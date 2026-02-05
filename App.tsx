@@ -129,20 +129,23 @@ export default function App() {
   };
 
   return (
-    <div className="h-full w-full flex flex-col font-sans text-slate-800">
+    // Use dvh (dynamic viewport height) to properly handle mobile browser address bars
+    <div className="h-[100dvh] w-full flex flex-col font-sans text-slate-800 bg-rose-50 overflow-hidden">
       {/* View Router */}
-      {view === ViewState.LANDING && <LandingPage onStart={() => setView(ViewState.AUTH)} />}
-      {view === ViewState.AUTH && <AuthPage onSuccess={handleLoginSuccess} onBack={() => setView(ViewState.LANDING)} />}
-      {view === ViewState.PAYMENT && user && <PaymentPage user={user} onSuccess={handlePaymentSuccess} onLogout={handleLogout} />}
-      {view === ViewState.CHAT && user && (
-        <ChatInterface 
-          user={user} 
-          onLogout={handleLogout} 
-          onDeleteAccount={handleDeleteAccount}
-          isSidebarOpen={isSidebarOpen}
-          toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-        />
-      )}
+      <div className="flex-1 h-full overflow-hidden relative">
+        {view === ViewState.LANDING && <LandingPage onStart={() => setView(ViewState.AUTH)} />}
+        {view === ViewState.AUTH && <AuthPage onSuccess={handleLoginSuccess} onBack={() => setView(ViewState.LANDING)} />}
+        {view === ViewState.PAYMENT && user && <PaymentPage user={user} onSuccess={handlePaymentSuccess} onLogout={handleLogout} />}
+        {view === ViewState.CHAT && user && (
+          <ChatInterface 
+            user={user} 
+            onLogout={handleLogout} 
+            onDeleteAccount={handleDeleteAccount}
+            isSidebarOpen={isSidebarOpen}
+            toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+          />
+        )}
+      </div>
     </div>
   );
 }
@@ -150,36 +153,38 @@ export default function App() {
 // --- Sub-Components (Pages) ---
 
 const LandingPage = ({ onStart }: { onStart: () => void }) => (
-  <div className="min-h-screen bg-gradient-to-br from-rose-50 via-red-50 to-rose-100 flex flex-col items-center justify-center p-6 text-center">
-    <div className="max-w-3xl space-y-8 animate-fade-in">
+  <div className="h-full overflow-y-auto bg-gradient-to-br from-rose-50 via-red-50 to-rose-100 flex flex-col items-center justify-center p-6 text-center">
+    <div className="max-w-3xl space-y-8 animate-fade-in py-10">
       <div className="flex justify-center mb-6">
         <div className="bg-rose-100 p-4 rounded-full shadow-lg ring-4 ring-rose-50">
           <Heart className="w-16 h-16 text-rose-600 fill-rose-600 animate-pulse" />
         </div>
       </div>
-      <h1 className="text-5xl md:text-7xl font-serif font-bold text-rose-900 tracking-tight drop-shadow-sm">
+      <h1 className="text-4xl md:text-7xl font-serif font-bold text-rose-900 tracking-tight drop-shadow-sm">
         Duoplee
       </h1>
-      <p className="text-xl md:text-2xl text-rose-800/80 font-light leading-relaxed max-w-2xl mx-auto">
-        Your personal AI companion for Valentine's Day. <br/>
+      <p className="text-lg md:text-2xl text-rose-800/80 font-light leading-relaxed max-w-2xl mx-auto">
+        Your personal AI companion for Valentine's Day. <br className="hidden md:block"/>
         Find the perfect gift, craft the perfect message, and plan the perfect date.
       </p>
       
-      <div className="grid md:grid-cols-3 gap-6 my-12 text-left">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-12 text-left w-full">
         <FeatureCard icon={<Gift className="w-6 h-6" />} title="Perfect Gifts" desc="Tailored suggestions based on your partner's unique personality." />
         <FeatureCard icon={<Sparkles className="w-6 h-6" />} title="Romantic Dates" desc="Creative and memorable date ideas for any budget." />
         <FeatureCard icon={<MessageSquare className="w-6 h-6" />} title="Love Letters" desc="Help drafting messages that express exactly how you feel." />
       </div>
 
-      <button 
-        onClick={onStart}
-        className="group relative px-8 py-4 bg-rose-600 text-white text-lg font-semibold rounded-full shadow-xl hover:bg-rose-700 hover:shadow-2xl transition-all transform hover:-translate-y-1"
-      >
-        <span className="flex items-center gap-2">
-          Start Your Journey <Heart className="w-5 h-5 fill-white group-hover:scale-110 transition-transform" />
-        </span>
-      </button>
-      <p className="text-sm text-rose-500 mt-4 font-medium">One-time access fee of ₹{PREMIUM_PRICE}</p>
+      <div className="flex flex-col items-center gap-4">
+        <button 
+          onClick={onStart}
+          className="group relative px-8 py-4 bg-rose-600 text-white text-lg font-semibold rounded-full shadow-xl hover:bg-rose-700 hover:shadow-2xl transition-all transform hover:-translate-y-1 w-full md:w-auto"
+        >
+          <span className="flex items-center justify-center gap-2">
+            Start Your Journey <Heart className="w-5 h-5 fill-white group-hover:scale-110 transition-transform" />
+          </span>
+        </button>
+        <p className="text-sm text-rose-500 font-medium">One-time access fee of ₹{PREMIUM_PRICE}</p>
+      </div>
     </div>
   </div>
 );
@@ -228,8 +233,8 @@ const AuthPage = ({ onSuccess, onBack }: { onSuccess: (u: User) => void, onBack:
   };
 
   return (
-    <div className="min-h-screen bg-rose-50 flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md border border-rose-100">
+    <div className="h-full overflow-y-auto bg-rose-50 flex items-center justify-center p-4">
+      <div className="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md border border-rose-100 my-auto">
         <div className="text-center mb-8">
             <Heart className="w-10 h-10 text-rose-500 mx-auto mb-2 fill-rose-500" />
             <h2 className="text-2xl font-serif font-bold text-rose-900">
@@ -253,7 +258,7 @@ const AuthPage = ({ onSuccess, onBack }: { onSuccess: (u: User) => void, onBack:
                 type="text" 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-rose-200 focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition-all bg-rose-50/30"
+                className="w-full px-4 py-3 rounded-xl border border-rose-200 focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition-all bg-rose-50/30 text-base"
                 placeholder="Romeo / Juliet"
               />
             </div>
@@ -265,7 +270,7 @@ const AuthPage = ({ onSuccess, onBack }: { onSuccess: (u: User) => void, onBack:
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-rose-200 focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition-all bg-rose-50/30"
+              className="w-full px-4 py-3 rounded-xl border border-rose-200 focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition-all bg-rose-50/30 text-base"
               placeholder="love@example.com"
             />
           </div>
@@ -276,13 +281,13 @@ const AuthPage = ({ onSuccess, onBack }: { onSuccess: (u: User) => void, onBack:
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-rose-200 focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition-all bg-rose-50/30"
+              className="w-full px-4 py-3 rounded-xl border border-rose-200 focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition-all bg-rose-50/30 text-base"
               placeholder="••••••••"
             />
           </div>
           <button 
             type="submit"
-            className="w-full py-3 bg-rose-600 text-white rounded-xl font-semibold shadow-lg hover:bg-rose-700 transition-colors mt-2"
+            className="w-full py-3 bg-rose-600 text-white rounded-xl font-semibold shadow-lg hover:bg-rose-700 transition-colors mt-2 text-base"
           >
             {isRegister ? "Create Account" : "Sign In"}
           </button>
@@ -308,56 +313,63 @@ const AuthPage = ({ onSuccess, onBack }: { onSuccess: (u: User) => void, onBack:
 
 const PaymentPage = ({ user, onSuccess, onLogout }: { user: User, onSuccess: () => void, onLogout: () => void }) => {
   const [status, setStatus] = useState<'waiting' | 'verifying' | 'success'>('waiting');
+  // Use a ref to track if the button was clicked, this persists across re-renders and handles stale closures in event listeners better
+  const hasClickedPay = useRef(false);
+  const fallbackTimerRef = useRef<any>(null);
   
   // Payment Details
   const upiId = "mahavirjaglan1@oksbi";
   const amount = PREMIUM_PRICE;
   const name = "Duoplee";
   
-  // UPI Deep Link Structure
   const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&am=${amount}.00&cu=INR&tn=Premium%20Access`;
-  
-  // QR Code URL
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiLink)}`;
 
   const handlePayClick = () => {
-    // 1. Open UPI intent
+    hasClickedPay.current = true;
+    
+    // 1. Attempt to open UPI app
     window.location.href = upiLink;
 
-    // 2. Start simulation of verification
-    if (status === 'waiting') {
-        setStatus('verifying');
-        setTimeout(() => {
-            setStatus('success');
-            setTimeout(() => {
-                onSuccess();
-            }, 1500);
-        }, 5000); // 5 seconds verification simulation
-    }
+    // 2. Set status to verifying immediately to give feedback
+    setStatus('verifying');
+
+    // 3. Set a fallback timer for Desktop or if app switch doesn't occur/isn't detected
+    if (fallbackTimerRef.current) clearTimeout(fallbackTimerRef.current);
+    fallbackTimerRef.current = setTimeout(() => {
+        setStatus('success');
+        setTimeout(onSuccess, 1500);
+    }, 10000); // 10s fallback
   };
 
   useEffect(() => {
-    // Listen for app switch (Mobile flow) - User goes to GPay and comes back
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && status === 'waiting') {
+      // If user comes back to the app (visible) AND they had clicked the button
+      if (document.visibilityState === 'visible' && hasClickedPay.current) {
+        // Clear the long fallback timer, we are back!
+        if (fallbackTimerRef.current) clearTimeout(fallbackTimerRef.current);
+        
+        // Force state to verifying if not already (though click handler does this)
         setStatus('verifying');
+        
+        // Fast-track success after a brief "checking" pause
         setTimeout(() => {
             setStatus('success');
-            setTimeout(onSuccess, 1500);
-        }, 3000);
+            setTimeout(onSuccess, 2000);
+        }, 1000);
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-
     return () => {
         document.removeEventListener('visibilitychange', handleVisibilityChange);
+        if (fallbackTimerRef.current) clearTimeout(fallbackTimerRef.current);
     };
-  }, [status, onSuccess]);
+  }, [onSuccess]);
 
   return (
-    <div className="min-h-screen bg-rose-50 flex items-center justify-center p-4">
-      <div className="bg-white max-w-lg w-full rounded-3xl shadow-2xl overflow-hidden border border-rose-100">
+    <div className="h-full overflow-y-auto bg-rose-50 flex items-center justify-center p-4">
+      <div className="bg-white max-w-lg w-full rounded-3xl shadow-2xl overflow-hidden border border-rose-100 my-auto">
         <div className="bg-gradient-to-r from-rose-500 to-red-600 p-8 text-white text-center">
             <Lock className="w-10 h-10 mx-auto mb-3 opacity-90" />
             <h2 className="text-2xl font-bold font-serif">Premium Access</h2>
@@ -446,8 +458,8 @@ const ChatInterface = ({
     user, 
     onLogout, 
     onDeleteAccount, 
-    isSidebarOpen,
-    toggleSidebar
+    isSidebarOpen, 
+    toggleSidebar 
 }: { 
     user: User, 
     onLogout: () => void, 
@@ -570,12 +582,20 @@ const ChatInterface = ({
     };
 
     return (
-        <div className="flex h-screen bg-white overflow-hidden">
+        <div className="flex h-full bg-white overflow-hidden relative">
+            {/* Mobile Sidebar Backdrop */}
+            {isSidebarOpen && (
+                <div 
+                    className="absolute inset-0 bg-black/30 backdrop-blur-sm z-20 md:hidden"
+                    onClick={toggleSidebar}
+                ></div>
+            )}
+
             {/* Sidebar */}
             <div className={`
-                fixed inset-y-0 left-0 z-30 w-80 bg-rose-50 border-r border-rose-100 transform transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none
+                absolute md:relative inset-y-0 left-0 z-30 w-80 bg-rose-50 border-r border-rose-100 transform transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none h-full flex flex-col
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-                md:relative md:translate-x-0 flex flex-col
+                md:translate-x-0
             `}>
                 <div className="p-5 border-b border-rose-100 flex items-center justify-between bg-rose-50">
                     <h2 className="font-serif font-bold text-2xl text-rose-900 flex items-center gap-2">
@@ -649,35 +669,60 @@ const ChatInterface = ({
             </div>
 
             {/* Main Chat Area */}
-            <div className="flex-1 flex flex-col h-full bg-white relative">
+            <div className="flex-1 flex flex-col h-full bg-white relative w-full">
                 {/* Header */}
-                <div className="h-20 border-b border-rose-50 flex items-center px-6 bg-white/90 backdrop-blur-md sticky top-0 z-10 justify-between">
-                    <div className="flex items-center gap-3">
-                        <button onClick={toggleSidebar} className="md:hidden p-2 text-slate-500 bg-slate-50 rounded-lg hover:bg-slate-100">
-                            <Menu className="w-5 h-5" />
+                <div className="h-16 md:h-20 border-b border-rose-50 flex items-center px-4 md:px-6 bg-white/80 backdrop-blur-xl sticky top-0 z-10 shrink-0 shadow-sm">
+                    {/* Mobile: 3-column layout for centered logo */}
+                    <div className="flex items-center justify-between w-full md:justify-start md:gap-4">
+                        
+                        {/* Left: Menu Trigger (Mobile) */}
+                        <button 
+                            onClick={toggleSidebar} 
+                            className="md:hidden p-2 -ml-2 text-rose-700 hover:bg-rose-50 rounded-full transition-colors"
+                        >
+                            <Menu className="w-6 h-6" />
                         </button>
-                        <div>
-                             <h3 className="font-serif font-bold text-xl text-slate-800">
-                                {currentSession?.title || "New Conversation"}
-                            </h3>
-                            <p className="text-xs text-rose-400">Duoplee - Valentine's Edition</p>
+
+                        {/* Center/Left: Elegant Logo */}
+                        <div className="flex flex-col items-center md:items-start md:flex-row md:gap-3">
+                             <div className="flex items-center gap-2">
+                                <div className="bg-rose-100 p-1.5 rounded-full md:bg-transparent md:p-0">
+                                    <Heart className="w-5 h-5 text-rose-600 fill-rose-600" /> 
+                                </div>
+                                <h1 className="font-serif font-bold text-2xl text-rose-900 tracking-tight">
+                                    Duoplee
+                                </h1>
+                             </div>
+                             {/* Context/Subtitle - hidden on very small screens if needed, or styled discreetly */}
+                             <span className="hidden md:block w-px h-4 bg-rose-200"></span>
+                             <p className="hidden md:block text-xs text-rose-500 font-medium">
+                                 {currentSession?.title || "Your Romantic Companion"}
+                             </p>
                         </div>
+
+                        {/* Right: Spacer or Action (e.g. New Chat shortcut for mobile) */}
+                        <button 
+                            onClick={handleNewChat}
+                            className="md:hidden p-2 -mr-2 text-rose-400 hover:text-rose-600 transition-colors"
+                        >
+                            <Plus className="w-6 h-6" />
+                        </button>
                     </div>
                 </div>
 
                 {/* Messages */}
                 <div 
                     ref={scrollRef}
-                    className="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 scroll-smooth"
+                    className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8 scroll-smooth"
                 >
                     {(!currentSession || currentSession.messages.length === 0) && (
                         <div className="h-full flex flex-col items-center justify-center opacity-60 space-y-6 animate-fade-in pb-20">
                             <div className="bg-rose-50 p-6 rounded-full">
                                 <Heart className="w-16 h-16 text-rose-400 fill-rose-100" />
                             </div>
-                            <div className="text-center space-y-2 max-w-md">
-                                <h3 className="text-2xl font-serif text-rose-900 font-bold">How can I help you love better?</h3>
-                                <p className="text-rose-500">Ask about gift ideas, date planning, or writing the perfect love letter.</p>
+                            <div className="text-center space-y-2 max-w-md px-4">
+                                <h3 className="text-xl md:text-2xl font-serif text-rose-900 font-bold">How can I help you love better?</h3>
+                                <p className="text-rose-500 text-sm md:text-base">Ask about gift ideas, date planning, or writing the perfect love letter.</p>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-lg px-4">
                                 <button onClick={() => setInput("What are some unique gift ideas for my boyfriend who loves tech?")} className="text-sm text-left p-3 border border-rose-100 rounded-xl hover:bg-rose-50 hover:border-rose-300 transition-colors text-slate-600">
@@ -696,7 +741,7 @@ const ChatInterface = ({
                             className={`flex ${msg.role === Role.USER ? 'justify-end' : 'justify-start'}`}
                         >
                             <div className={`
-                                max-w-[90%] md:max-w-[75%] rounded-3xl px-6 py-5 shadow-sm text-base leading-relaxed
+                                max-w-[90%] md:max-w-[75%] rounded-3xl px-5 py-4 md:px-6 md:py-5 shadow-sm text-sm md:text-base leading-relaxed
                                 ${msg.role === Role.USER 
                                     ? 'bg-rose-600 text-white rounded-br-sm' 
                                     : 'bg-white border border-rose-100 text-slate-800 rounded-bl-sm shadow-md'}
@@ -719,10 +764,11 @@ const ChatInterface = ({
                              </div>
                         </div>
                     )}
+                    <div className="h-1"></div> {/* Spacer for bottom scroll */}
                 </div>
 
                 {/* Input Area */}
-                <div className="p-4 md:p-6 bg-white border-t border-rose-50">
+                <div className="p-3 md:p-6 bg-white border-t border-rose-50 shrink-0">
                     <div className="max-w-4xl mx-auto relative flex items-end gap-2 bg-rose-50/50 border border-rose-200 rounded-3xl p-2 focus-within:ring-2 focus-within:ring-rose-500/20 focus-within:border-rose-400 transition-all shadow-sm">
                         <textarea
                             value={input}
@@ -734,18 +780,18 @@ const ChatInterface = ({
                                 }
                             }}
                             placeholder="What should I get for my partner..."
-                            className="w-full pl-4 py-3 bg-transparent border-none outline-none text-slate-700 placeholder-rose-300 resize-none max-h-32 min-h-[50px]"
+                            className="w-full pl-4 py-3 bg-transparent border-none outline-none text-slate-700 placeholder-rose-300 resize-none max-h-32 min-h-[50px] text-base"
                             rows={1}
                         />
                         <button 
                             onClick={handleSend}
                             disabled={!input.trim() || isTyping}
-                            className="mb-1 mr-1 p-3 bg-rose-600 text-white rounded-full hover:bg-rose-700 disabled:opacity-50 disabled:hover:bg-rose-600 transition-all shadow-md active:scale-95"
+                            className="mb-1 mr-1 p-3 bg-rose-600 text-white rounded-full hover:bg-rose-700 disabled:opacity-50 disabled:hover:bg-rose-600 transition-all shadow-md active:scale-95 flex-shrink-0"
                         >
                             <Send className="w-5 h-5" />
                         </button>
                     </div>
-                    <p className="text-center text-[10px] text-slate-400 mt-3">
+                    <p className="text-center text-[10px] text-slate-400 mt-2 md:mt-3">
                         Duoplee may display inaccurate info about people, places, or facts.
                     </p>
                 </div>
