@@ -322,14 +322,20 @@ const PaymentPage = ({ user, onSuccess, onLogout }: { user: User, onSuccess: () 
   const amount = PREMIUM_PRICE;
   const name = "Duoplee";
   
-  const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&am=${amount}.00&cu=INR&tn=Premium%20Access`;
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiLink)}`;
+  // Standard UPI Link for QR Code (must use upi:// to be scannable by all apps)
+  const qrLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&am=${amount}.00&cu=INR&tn=Premium%20Access`;
+  
+  // GPay Specific Link (using tez:// scheme to force Google Pay India)
+  // This prevents the intent from accidentally defaulting to WhatsApp or other UPI apps on button click.
+  const gpayLink = `tez://upi/pay?pa=${upiId}&pn=${encodeURIComponent(name)}&am=${amount}.00&cu=INR&tn=Premium%20Access`;
+
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrLink)}`;
 
   const handlePayClick = () => {
     hasClickedPay.current = true;
     
-    // 1. Attempt to open UPI app
-    window.location.href = upiLink;
+    // 1. Attempt to open GPay specifically using the tez:// scheme
+    window.location.href = gpayLink;
 
     // 2. Set status to verifying immediately to give feedback
     setStatus('verifying');
@@ -798,4 +804,4 @@ const ChatInterface = ({
             </div>
         </div>
     );
-};
+}
