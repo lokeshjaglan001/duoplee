@@ -1,10 +1,3 @@
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  isPremium: boolean;
-}
-
 export enum ViewState {
   LANDING = 'LANDING',
   AUTH = 'AUTH',
@@ -13,8 +6,16 @@ export enum ViewState {
 }
 
 export enum Role {
-  USER = 'user',
-  MODEL = 'model'
+  USER = 'USER',
+  MODEL = 'MODEL'
+}
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  isPremium: boolean;
+  createdAt: number;
 }
 
 export interface Message {
@@ -28,5 +29,6 @@ export interface ChatSession {
   id: string;
   title: string;
   messages: Message[];
+  createdAt: number;
   lastUpdated: number;
 }

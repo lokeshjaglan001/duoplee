@@ -1,58 +1,61 @@
 import { Message, Role } from '../types';
-import { GEMINI_API_KEY, GEMINI_API_URL } from '../constants';
 
-const SYSTEM_PROMPT = `You are Duoplee, an expert Valentine's Day romantic assistant. Your purpose is to help people create memorable romantic experiences.
+const API_KEY = 'YOUR_GEMINI_API_KEY_HERE'; // Replace with your actual API key
+const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
-Your expertise includes:
-- Thoughtful gift recommendations based on interests, budget, and personality
-- Creative date ideas for all budgets and preferences
-- Help writing heartfelt love letters, messages, and romantic gestures
-- Advice on romantic planning and relationship enhancement
+const SYSTEM_PROMPT = `You are Duoplee, an AI Romance Assistant specialized in helping people with Valentine's Day planning. Your expertise includes:
 
-Guidelines:
-- Be warm, enthusiastic, and genuinely helpful
-- Provide specific, actionable suggestions
+1. **Gift Recommendations**: Suggest thoughtful, personalized gifts based on the partner's interests, budget, and relationship dynamics
+2. **Date Planning**: Create romantic date ideas ranging from intimate home experiences to grand adventures
+3. **Love Messages**: Help craft heartfelt messages, love letters, cards, and romantic texts
+4. **Relationship Advice**: Provide warm, supportive guidance on expressing love and appreciation
+
+**Your Personality**:
+- Warm, romantic, and empathetic
+- Creative and detail-oriented
+- Respectful of all relationship types and budgets
+- Encouraging and positive
+
+**Guidelines**:
+- Always ask clarifying questions to personalize suggestions
+- Provide specific, actionable recommendations
 - Consider budget constraints when mentioned
-- Be culturally sensitive and inclusive
-- Focus on creating genuine emotional connections
-- Use formatting with markdown (headers ###, bold **text**, bullet points *)
+- Be inclusive of different relationship stages and types
+- Use romantic but not overly cheesy language
+- Format responses with clear sections using markdown (### for headers, * for bullet points, **bold** for emphasis)
 
-Always respond with practical, creative ideas that help people express their love meaningfully.`;
+Remember: Every love story is unique. Help make this Valentine's Day special and memorable!`;
 
-export async function sendMessageToGemini(
-  conversationHistory: Message[],
-  newMessage: string
-): Promise<string> {
+export async function sendMessageToGemini(conversationHistory: Message[], userMessage: string): Promise<string> {
   try {
-    // Check if API key is configured
-    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'AIzaSyACBuXqYCtKiEhR1SC_4y5UHmaGHELqCRQ') {
-      // Return a helpful mock response for development/demo
-      return generateMockResponse(newMessage);
-    }
-
-    // Build conversation context
+    // Build the conversation context
     const contents = [
       {
         role: 'user',
         parts: [{ text: SYSTEM_PROMPT }]
       },
-      ...conversationHistory.slice(-10).map(msg => ({
-        role: msg.role === Role.USER ? 'user' : 'model',
-        parts: [{ text: msg.text }]
-      })),
       {
-        role: 'user',
-        parts: [{ text: newMessage }]
+        role: 'model',
+        parts: [{ text: 'I understand! I\'m Duoplee, your AI Romance Assistant. I\'m here to help you create the perfect Valentine\'s Day experience. How can I help you today?' }]
       }
     ];
 
-    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+    // Add conversation history
+    conversationHistory.forEach(msg => {
+      contents.push({
+        role: msg.role === Role.USER ? 'user' : 'model',
+        parts: [{ text: msg.text }]
+      });
+    });
+
+    // Make API request
+    const response = await fetch(`${API_URL}?key=${API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        contents,
+        contents: contents,
         generationConfig: {
           temperature: 0.9,
           topK: 40,
@@ -67,116 +70,126 @@ export async function sendMessageToGemini(
           {
             category: 'HARM_CATEGORY_HATE_SPEECH',
             threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          },
+          {
+            category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          },
+          {
+            category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
           }
         ]
       })
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorData = await response.json();
       console.error('Gemini API Error:', errorData);
-      throw new Error(`API Error: ${response.status}`);
+      throw new Error(`API request failed: ${response.status}`);
     }
 
     const data = await response.json();
     
-    if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-      return data.candidates[0].content.parts[0].text;
+    // Extract the response text
+    if (data.candidates && data.candidates.length > 0) {
+      const candidate = data.candidates[0];
+      if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+        return candidate.content.parts[0].text;
+      }
     }
 
-    throw new Error('Unexpected response format');
-
+    throw new Error('No response generated');
+    
   } catch (error) {
-    console.error('Gemini API Error:', error);
-    // Return helpful mock response on error
-    return generateMockResponse(newMessage);
+    console.error('Error calling Gemini API:', error);
+    
+    // Fallback response
+    return generateFallbackResponse(userMessage);
   }
 }
 
-// Mock responses for development/demo when API key is not configured
-function generateMockResponse(message: string): string {
-  const lowerMessage = message.toLowerCase();
+function generateFallbackResponse(userMessage: string): string {
+  const lowerMsg = userMessage.toLowerCase();
+  
+  if (lowerMsg.includes('gift') || lowerMsg.includes('present')) {
+    return `### Gift Ideas 🎁
 
-  // Gift suggestions
-  if (lowerMessage.includes('gift') || lowerMessage.includes('present')) {
-    return `### Perfect Gift Ideas 🎁
+I'd love to help you find the perfect gift! To give you the best recommendations, could you tell me:
 
-Based on your request, here are some thoughtful suggestions:
+* What are your partner's main interests or hobbies?
+* What's your budget range?
+* Are you looking for something romantic, practical, or experiential?
 
-* **Personalized Photo Album**: Create a custom album with your favorite memories together. Budget-friendly and deeply meaningful.
+**Popular Valentine's Gift Categories:**
+* **Personalized items**: Custom jewelry, photo albums, engraved items
+* **Experiences**: Spa day, cooking class, weekend getaway
+* **Classic romance**: Flowers, chocolates, perfume/cologne
+* **Tech & gadgets**: Smartwatch, wireless earbuds, e-reader
+* **Handmade**: DIY photo book, handwritten letters, custom playlist
 
-* **Experience Gift**: Concert tickets, cooking class, or spa day. Experiences create lasting memories.
-
-* **Handmade Gift**: A scrapbook, painted portrait, or handwritten letter collection. Shows effort and thoughtfulness.
-
-* **Tech Gadget**: Wireless earbuds, smartwatch, or portable speaker for the tech enthusiast.
-
-* **Subscription Box**: Monthly delivery of their favorite things - coffee, books, snacks, or self-care items.
-
-**Pro Tip**: The best gifts show you listen and understand what makes them happy. Combine a physical gift with a heartfelt handwritten note for maximum impact!
-
-Would you like more specific suggestions based on their interests or your budget?`;
+Let me know more details and I'll suggest specific options!`;
   }
-
-  // Date ideas
-  if (lowerMessage.includes('date') || lowerMessage.includes('romantic')) {
+  
+  if (lowerMsg.includes('date') || lowerMsg.includes('dinner') || lowerMsg.includes('restaurant')) {
     return `### Romantic Date Ideas 💕
 
-Here are some wonderful options to create special moments:
+I can help you plan the perfect date! Here are some ideas to get started:
 
-* **Cozy Home Date**: Cook their favorite meal together, set up candles, create a playlist of "your songs," and have a movie marathon.
+**Intimate Indoor Dates:**
+* **Home-cooked dinner**: Cook their favorite meal together with candles and music
+* **Movie marathon**: Create a cozy setup with their favorite films and snacks
+* **Game night**: Board games, card games, or video games you both enjoy
 
-* **Sunset Picnic**: Pack a basket with snacks, wine, and a cozy blanket. Find a scenic spot to watch the sunset together.
+**Outdoor Adventures:**
+* **Sunset picnic**: Pack favorite foods and watch the sunset together
+* **Nature walk**: Hiking trail or botanical garden visit
+* **Stargazing**: Find a quiet spot away from city lights
 
-* **Adventure Date**: Try something new together - rock climbing, pottery class, dance lessons, or exploring a new neighborhood.
+**Special Experiences:**
+* **Cooking class**: Learn to make a new cuisine together
+* **Wine tasting**: Visit a local winery or create a tasting at home
+* **Concert or show**: Live music or theater performance
 
-* **Nostalgic Date**: Recreate your first date or visit places that hold special memories.
-
-* **Star Gazing**: Drive out of the city, bring blankets and hot chocolate, and spend the evening under the stars.
-
-**Budget Tip**: Romance is about thoughtfulness, not expense. A heartfelt picnic in the park can be more meaningful than an expensive restaurant.
-
-What type of experience does your partner enjoy most?`;
+What type of experience sounds most appealing to you both?`;
   }
+  
+  if (lowerMsg.includes('letter') || lowerMsg.includes('message') || lowerMsg.includes('write') || lowerMsg.includes('card')) {
+    return `### Writing a Love Letter 💌
 
-  // Love letter/message help
-  if (lowerMessage.includes('letter') || lowerMessage.includes('message') || lowerMessage.includes('write')) {
-    return `### Crafting the Perfect Love Message 💌
-
-Here's a framework to express your feelings authentically:
+I'd be happy to help you express your feelings! Here's a structure to get started:
 
 **Opening:**
-Start with something specific about them that made you smile recently. Example: "I keep thinking about how you laughed at that terrible joke yesterday..."
+Start with a warm greeting and set the tone - "My Dearest [Name]" or "To my beloved"
 
-**The Heart:**
-* Share a specific memory that means a lot to you
-* Describe what you love about who they are (not just what they do)
-* Explain how they've changed your life for the better
+**Share Specific Memories:**
+* Mention when you first met or a special moment
+* Describe what you love about them specifically
+* Share how they've impacted your life
 
-**The Future:**
-* Express excitement about experiences you'll share
-* Make a small promise or commitment
-* End with how they make you feel
+**Express Your Feelings:**
+* Be genuine and speak from the heart
+* Use "I" statements: "I love how you...", "I appreciate when you..."
+* Don't worry about being poetic - authenticity matters most
 
-**Example Template:**
-"Every time I see you [specific action], my heart skips a beat. I love how you [personality trait]. Thank you for [specific thing they did]. I can't wait to [future plan]. You make me feel [emotion]."
+**Look to the Future:**
+* Share your hopes and dreams together
+* Express excitement about what's to come
 
-**Remember**: Authenticity beats perfection. Write from your heart, and they'll cherish every word.
+**Closing:**
+End with a loving sign-off like "Forever yours" or "All my love"
 
-Would you like help with a specific type of message?`;
+Would you like me to help you draft specific sections based on your relationship?`;
   }
+  
+  return `### How Can I Help? 💝
 
-  // General relationship advice
-  return `### I'm Here to Help! 💝
+I'm here to assist you with your Valentine's Day planning! I can help with:
 
-I'd love to assist you with Valentine's Day planning! I can help with:
+* **🎁 Gift Ideas**: Personalized recommendations based on interests and budget
+* **🕯️ Date Planning**: Romantic activities from cozy nights in to special outings  
+* **💌 Love Messages**: Crafting heartfelt letters, cards, or text messages
+* **💐 Relationship Tips**: Advice on expressing love and appreciation
 
-* **Gift Ideas**: Personalized suggestions for any budget or interest
-* **Date Planning**: Creative ideas from cozy nights to adventurous outings
-* **Love Letters**: Help expressing your feelings perfectly
-* **Romantic Gestures**: Thoughtful ways to show you care
-
-Tell me more about what you're looking for, and I'll provide specific suggestions tailored to your needs!
-
-What aspect of Valentine's Day planning can I help you with today?`;
+What would you like help with today? Feel free to share details about your situation and I'll provide personalized suggestions!`;
 }
